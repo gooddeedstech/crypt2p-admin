@@ -9,13 +9,10 @@ import { useAuth } from "../auth/Provider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import LoadingScreen from "@/components/loading-screen";
-import { DashboardProvider } from "./Provider";
-import { UserAnalyticsProvider } from "../analytics/UserAnalyticsProvider";
-import { TransactionAnalyticsProvider } from "../analytics/TransactionsAnalyticsProvider";
-import { RecentTransactionsTable } from "@/components/recent-transactions-table";
-import { DevicePieChart } from "@/components/device-pie-chart";
+import { LedgerProvider } from "./LedgerProvider";
+import { LedgerComponent } from "@/components/ledger-component";
 
-export default function Page() {
+export default function Ledger() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -36,30 +33,16 @@ export default function Page() {
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title="Dashboard" />
+        <SiteHeader title="Ledger Management" />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <DashboardProvider>
-                <SectionCards />
-              </DashboardProvider>
-              <div className="px-4 lg:px-6 grid grid-cols-2 gap-4">
-                <UserAnalyticsProvider>
-                  <ChartAreaInteractive />
-                </UserAnalyticsProvider>
-                <UserAnalyticsProvider>
-                  <DevicePieChart />
-                </UserAnalyticsProvider>
-              </div>
-
-              <TransactionAnalyticsProvider>
+              <LedgerProvider>
                 <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">
-                    Recent Transactions
-                  </h2>
-                  <RecentTransactionsTable />
+                  <h1 className="text-2xl font-bold mb-6">Ledger Management</h1>
+                  <LedgerComponent />
                 </div>
-              </TransactionAnalyticsProvider>
+              </LedgerProvider>
             </div>
           </div>
         </div>

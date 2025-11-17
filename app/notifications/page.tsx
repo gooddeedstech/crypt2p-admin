@@ -14,6 +14,7 @@ import { SectionUserCards } from "@/components/section-cards-user";
 import { UsersTable } from "@/components/user-table";
 import { NotificationsProvider } from "./NotificationsProvider";
 import { SendNotification } from "@/components/send-notifications";
+import { SentNotificationsTable } from "@/components/sent-notifications-table";
 
 export default function Notifications() {
   const { user, loading } = useAuth();
@@ -44,6 +45,12 @@ export default function Notifications() {
                 <div className="p-6">
                   <h1 className="text-2xl font-bold mb-6">Send Notification</h1>
                   <SendNotification />
+                  <div className="mt-6">
+                    <h2 className="text-xl font-semibold mb-4">
+                      Sent Notifications
+                    </h2>
+                    <SentNotificationsTable />
+                  </div>
                 </div>
               </NotificationsProvider>
             </div>

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useUserAnalytics } from "@/app/analytics/UserAnalyticsProvider";
+import { Skeleton } from "./ui/skeleton";
 
 export const description = "An interactive area chart";
 
@@ -81,6 +82,15 @@ export function ChartAreaInteractive() {
     startDate.setDate(startDate.getDate() - daysToSubtract);
     return date >= startDate;
   });
+
+  if (loading)
+    return (
+      <div className="flex gap-4 overflow-x-auto">
+        {[...Array(1)].map((_, i) => (
+          <Skeleton key={i} className="h-[392px] flex-1 shrink-0" />
+        ))}
+      </div>
+    );
 
   return (
     <Card className="@container/card">

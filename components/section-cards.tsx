@@ -12,9 +12,18 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { cn } from "@/lib/utils";
 import { useDashboard } from "@/app/dashboard/Provider";
+import { Skeleton } from "./ui/skeleton";
 
 export function SectionCards() {
   const { data, loading } = useDashboard();
+  if (loading)
+    return (
+      <div className="flex gap-4 overflow-x-auto p-6">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-[184px] flex-1 shrink-0" />
+        ))}
+      </div>
+    );
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <Card className="@container/card">

@@ -42,9 +42,12 @@ interface UserAnalyticsContextType {
   } | null;
   loadingUsers: boolean;
   fetchUsers: (params?: FetchUsersParams) => void;
+  deviceStats: Array<{ type: "ANDROID" | "IOS" | "WEB"; count: number }> | null;
+  loadingDevices: boolean;
+  fetchDeviceStats: () => void;
 }
 
-interface User {
+export interface User {
   id: string;
   email: string;
   fullName: string;
@@ -95,6 +98,29 @@ export function UserAnalyticsProvider({ children }: { children: ReactNode }) {
   const [usersPagination, setUsersPagination] =
     useState<UserAnalyticsContextType["usersPagination"]>(null);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [deviceStats, setDeviceStats] = useState<
+    Array<{ type: "ANDROID" | "IOS" | "WEB"; count: number }>
+  >([]);
+  const [loadingDevices, setLoadingDevices] = useState(true);
+
+  const fetchDeviceStats = async () => {
+    setLoadingDevices(true);
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) throw new Error("No token");
+
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE}/analytics/by-type`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setDeviceStats(res.data);
+    } catch (err) {
+      console.error("Failed to load device stats:", err);
+    } finally {
+      setLoadingDevices(false);
+    }
+  };
 
   const fetchUsers = async (params: FetchUsersParams = {}) => {
     const {
@@ -200,6 +226,7 @@ export function UserAnalyticsProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    fetchDeviceStats();
     fetchUsers();
     fetchTrends();
     fetchTop();
@@ -217,6 +244,9 @@ export function UserAnalyticsProvider({ children }: { children: ReactNode }) {
         loading,
         loadingTop,
         error,
+        deviceStats,
+        loadingDevices,
+        fetchDeviceStats,
         fetchUsers,
         refetch: fetchTrends,
         refetchTop: fetchTop,
