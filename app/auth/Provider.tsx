@@ -13,14 +13,20 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface User {
+  id: string;
   email: string;
   name?: string;
+  role: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  changePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>;
   loading: boolean;
   error: string | null;
 }
@@ -35,14 +41,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE,
-    validateStatus: (status) => status >= 200 && status < 300,
-    // withCredentials: true,
   });
 
-  // Inject JWT from cookie into every request
+  // Inject token from localStorage (or cookie fallback)
   api.interceptors.request.use((config) => {
-    const match = document.cookie.match(/(^|;) ?auth-token=([^;]*)(;|$)/);
-    const token = match ? match[2] : null;
+    const token = localStorage.getItem("auth_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -54,41 +57,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null);
     try {
       const res = await api.post("/admin/auth/login", { email, password });
-      console.log(res.data);
       const { admin, token } = res.data;
       setUser(admin);
       localStorage.setItem("admin", JSON.stringify(admin));
       localStorage.setItem("auth_token", token);
-      toast.success(`Welcome ${res.data.admin.name}`);
+      toast.success(`Welcome ${admin.name}`);
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
-      toast.error(err.response?.data?.message || "Login failed");
+      const msg = err.response?.data?.message || "Login failed";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    try {
-      await api.post("/auth/logout");
-      localStorage.removeItem("admin");
-      localStorage.removeItem("auth_token");
-    } catch {}
+    localStorage.removeItem("admin");
+    localStorage.removeItem("auth_token");
     setUser(null);
     router.push("/login");
+    toast.success("Logged out successfully");
+  };
+
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string
+  ) => {
+    if (newPassword.length < 8) {
+      throw new Error("New password must be at least 8 characters");
+    }
+
+    try {
+      await api.post("/admin/auth/change-password", {
+        currentPassword,
+        newPassword,
+      });
+      toast.success("Password changed successfully");
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Failed to change password";
+      toast.error(msg);
+      throw new Error(msg);
+    }
   };
 
   useEffect(() => {
     const stored = localStorage.getItem("admin");
     if (stored) {
-      setUser(JSON.parse(stored));
+      try {
+        setUser(JSON.parse(stored));
+      } catch {
+        localStorage.removeItem("admin");
+      }
     }
     setLoading(false);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, error }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, changePassword, loading, error }}
+    >
       {children}
     </AuthContext.Provider>
   );

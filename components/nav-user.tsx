@@ -26,10 +26,14 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/app/auth/Provider";
+import { useState } from "react";
+import { ChangePasswordDialog } from "./change-password-dialog";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   return (
     <SidebarMenu>
@@ -87,18 +91,22 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconPassword />
+              <DropdownMenuItem onClick={() => setChangePasswordOpen(true)}>
+                <IconPassword className="mr-2 h-4 w-4" />
                 Change Password
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => logout()}>
               <IconLogout />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <ChangePasswordDialog
+          open={changePasswordOpen}
+          onOpenChange={setChangePasswordOpen}
+        />
       </SidebarMenuItem>
     </SidebarMenu>
   );

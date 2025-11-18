@@ -27,10 +27,13 @@ import { format } from "date-fns";
 import { useLedger } from "@/app/ledger/LedgerProvider";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/app/auth/Provider";
 
 export function LedgerComponent() {
   const { entries, pagination, loading, fetchEntries, credit, loadingCredit } =
     useLedger();
+
+  const { user } = useAuth();
 
   // Form
   const [adminId, setAdminId] = useState("");
@@ -45,14 +48,14 @@ export function LedgerComponent() {
 
   const handleCredit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!adminId || !description || !amount) {
+    if (!user?.id || !description || !amount) {
       toast.error("All fields are required");
       return;
     }
 
     try {
       await credit({
-        adminId,
+        adminId: user?.id || "",
         description,
         amount: Number(amount),
       });
@@ -91,7 +94,7 @@ export function LedgerComponent() {
         </CardHeader>
         <CardContent className="w-full">
           <form onSubmit={handleCredit} className="space-y-4">
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="adminId">Admin ID</Label>
               <Input
                 id="adminId"
@@ -100,7 +103,7 @@ export function LedgerComponent() {
                 placeholder="e.g. admin_123"
                 required
               />
-            </div>
+            </div> */}
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
@@ -139,8 +142,8 @@ export function LedgerComponent() {
         <CardContent className="space-y-4 w-full">
           {/* Filters */}
           <div className="space-y-3 p-4 bg-muted/30 rounded-lg">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {/* <div className="space-y-2">
                 <Label htmlFor="f-userId">User ID</Label>
                 <Input
                   id="f-userId"
@@ -148,7 +151,7 @@ export function LedgerComponent() {
                   onChange={(e) => setUserId(e.target.value)}
                   placeholder="Filter by user"
                 />
-              </div>
+              </div> */}
               <div className="space-y-2">
                 <Label htmlFor="f-type">Type</Label>
                 <Select value={type} onValueChange={setType}>
