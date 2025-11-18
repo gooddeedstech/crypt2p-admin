@@ -16,6 +16,26 @@ import { Skeleton } from "./ui/skeleton";
 
 export function SectionCards() {
   const { data, loading } = useDashboard();
+
+  const getPercentageText = (direction: string, value: number) => {
+    if (direction === "up") {
+      return `Up by ${value}% Today`;
+    } else if (direction === "down") {
+      return `Down by ${value}% Today`;
+    } else {
+      return "Neutral Today";
+    }
+  };
+  const getPercentageIcon = (direction: string, value: number) => {
+    if (direction === "up") {
+      return <IconTrendingUp className="size-4" />;
+    } else if (direction === "down") {
+      return <IconTrendingDown className="size-4" />;
+    } else {
+      return "~";
+    }
+  };
+
   if (loading)
     return (
       <div className="flex gap-4 overflow-x-auto p-6">
@@ -34,14 +54,30 @@ export function SectionCards() {
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <IconTrendingUp />
-              +15%
+              {data?.changes.totalUsers.direction === "up" ? (
+                <IconTrendingUp />
+              ) : data?.changes.totalUsers.direction === "down" ? (
+                <IconTrendingDown />
+              ) : null}
+              {data?.changes.totalUsers.direction === "up"
+                ? "+"
+                : data?.changes.totalUsers.direction === "down"
+                ? "-"
+                : ""}
+              {data?.changes.totalUsers.value}%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Up 15% this month <IconTrendingUp className="size-4" />
+            {getPercentageText(
+              data?.changes.totalUsers.direction || "neutral",
+              data?.changes.totalUsers.value || 0
+            )}{" "}
+            {getPercentageIcon(
+              data?.changes.totalUsers.direction || "neutral",
+              data?.changes.totalUsers.value || 0
+            )}
           </div>
           <div className="text-muted-foreground">Total Users on Crypt2p</div>
         </CardFooter>
@@ -61,7 +97,14 @@ export function SectionCards() {
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 2% this week <IconTrendingDown className="size-4" />
+            {getPercentageText(
+              data?.changes.activeUsers.direction || "neutral",
+              data?.changes.activeUsers.value || 0
+            )}{" "}
+            {getPercentageIcon(
+              data?.changes.activeUsers.direction || "neutral",
+              data?.changes.activeUsers.value || 0
+            )}
           </div>
           <div className="text-muted-foreground">
             Total Active Users on Crypt2p
@@ -83,7 +126,7 @@ export function SectionCards() {
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Up by 1.3% this month <IconTrendingUp className="size-4" />
+            {/* Up by 1.3% this month <IconTrendingUp className="size-4" /> */}
           </div>
           <div className="text-muted-foreground">Total Deleted Account</div>
         </CardFooter>
@@ -148,7 +191,16 @@ export function SectionCards() {
 
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium h-4">
-            {/* Steady Increase <IconTrendingUp className="size-4" /> */}
+            <div className="line-clamp-1 flex gap-2 font-medium ">
+              {getPercentageText(
+                data?.changes.registeredThisYear.direction || "neutral",
+                data?.changes.registeredThisYear.value || 0
+              )}{" "}
+              {getPercentageIcon(
+                data?.changes.registeredThisYear.direction || "neutral",
+                data?.changes.registeredThisYear.value || 0
+              )}
+            </div>
           </div>
           <div className="text-muted-foreground">
             Total Registered in Period

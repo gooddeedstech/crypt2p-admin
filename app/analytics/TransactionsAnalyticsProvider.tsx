@@ -55,6 +55,20 @@ interface FetchParams {
   endDate?: string;
 }
 
+export interface SupportedAsset {
+  code: string;
+  description: string;
+  networks: Array<{ name: string; value: string }>;
+  usdBuyPrice: number;
+  usdSellPrice: number;
+  ngnBuyPrice: number;
+  ngnSellPrice: number;
+  minBuyValue: number;
+  maxBuyValue: number;
+  minSellValue: number;
+  maxSellValue: number;
+}
+
 interface TransactionContextType {
   transactions: Transaction[] | null;
   pagination: {
@@ -72,6 +86,19 @@ interface TransactionContextType {
   refetch: (params: FetchParams) => void;
   refetchCards: () => void;
   refetchAssets: () => void;
+  supportedAssets: SupportedAsset[] | null;
+  loadingSupportedAssets: boolean;
+  refetchSupportedAssets: () => void;
+  assetDailyData: {
+    assets: string[];
+    days: string[];
+    dataset: Array<Record<string, number> & { date: string }>;
+  } | null;
+  loadingAssetDaily: boolean;
+  fetchAssetDaily: (
+    days: number,
+    type: "CRYPTO_TO_CASH" | "CASH_TO_CRYPTO"
+  ) => void;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(
@@ -92,6 +119,58 @@ export function TransactionAnalyticsProvider({
   const [loadingCards, setLoadingCards] = useState(true);
   const [loadingAssets, setLoadingAssets] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [supportedAssets, setSupportedAssets] = useState<
+    SupportedAsset[] | null
+  >(null);
+  const [loadingSupportedAssets, setLoadingSupportedAssets] = useState(true);
+  const [assetDailyData, setAssetDailyData] =
+    useState<TransactionContextType["assetDailyData"]>(null);
+  const [loadingAssetDaily, setLoadingAssetDaily] = useState(false);
+
+  const fetchAssetDaily = async (
+    days: number,
+    type: "CRYPTO_TO_CASH" | "CASH_TO_CRYPTO"
+  ) => {
+    setLoadingAssetDaily(true);
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) throw new Error("No token");
+
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE}/analytics/transactions/by-asset-days`,
+        {
+          params: { days, type },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setAssetDailyData(res.data);
+    } catch (err) {
+      console.error("Failed to load daily asset data:", err);
+      setAssetDailyData(null);
+    } finally {
+      setLoadingAssetDaily(false);
+    }
+  };
+
+  const fetchSupportedAssets = async () => {
+    setLoadingSupportedAssets(true);
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) throw new Error("No token");
+
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE}/analytics/assets`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setSupportedAssets(res.data);
+    } catch (err: any) {
+      console.error("Failed to load supported assets:", err);
+    } finally {
+      setLoadingSupportedAssets(false);
+    }
+  };
 
   const fetchRecent = async (params: FetchParams = {}) => {
     const {
@@ -187,6 +266,8 @@ export function TransactionAnalyticsProvider({
     fetchRecent();
     fetchCards();
     fetchAssetSummary();
+    fetchSupportedAssets();
+    fetchAssetDaily(7, "CRYPTO_TO_CASH");
   }, []);
 
   return (
@@ -203,6 +284,12 @@ export function TransactionAnalyticsProvider({
         refetch: fetchRecent,
         refetchCards: fetchCards,
         refetchAssets: fetchAssetSummary,
+        supportedAssets,
+        loadingSupportedAssets,
+        refetchSupportedAssets: fetchSupportedAssets,
+        assetDailyData,
+        loadingAssetDaily,
+        fetchAssetDaily,
       }}
     >
       {children}

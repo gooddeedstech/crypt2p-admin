@@ -17,6 +17,20 @@ interface DashboardData {
   registeredToday: number;
   registeredThisMonth: number;
   registeredThisYear: number;
+  changes: Changes;
+}
+
+interface ChangeEntry {
+  value: number;
+  direction: "up" | "down" | "neutral";
+}
+
+interface Changes {
+  registeredToday: ChangeEntry;
+  registeredThisMonth: ChangeEntry;
+  registeredThisYear: ChangeEntry;
+  totalUsers: ChangeEntry;
+  activeUsers: ChangeEntry;
 }
 
 interface DashboardContextType {

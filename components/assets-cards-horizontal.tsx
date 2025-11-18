@@ -19,7 +19,7 @@ export function AssetCardsHorizontal() {
 
   if (loadingAssets) {
     return (
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
         {[...Array(4)].map((_, i) => (
           <Skeleton key={i} className="h-[242px] w-md shrink-0" />
         ))}

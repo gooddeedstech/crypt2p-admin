@@ -14,6 +14,8 @@ import { UserAnalyticsProvider } from "../analytics/UserAnalyticsProvider";
 import { TransactionAnalyticsProvider } from "../analytics/TransactionsAnalyticsProvider";
 import { RecentTransactionsTable } from "@/components/recent-transactions-table";
 import { DevicePieChart } from "@/components/device-pie-chart";
+import { SupportedAssets } from "@/components/supported-assets";
+import { AssetDailyChart } from "@/components/asset-daily-chart";
 
 export default function Page() {
   const { user, loading } = useAuth();
@@ -43,13 +45,21 @@ export default function Page() {
               <DashboardProvider>
                 <SectionCards />
               </DashboardProvider>
-              <div className="px-4 lg:px-6 grid grid-cols-2 gap-4">
+              <TransactionAnalyticsProvider>
+                <div className="pl-6">
+                  <SupportedAssets />
+                </div>
+              </TransactionAnalyticsProvider>
+              <div className="px-4 lg:px-6 grid grid-cols-3 gap-4">
                 <UserAnalyticsProvider>
                   <ChartAreaInteractive />
                 </UserAnalyticsProvider>
                 <UserAnalyticsProvider>
                   <DevicePieChart />
                 </UserAnalyticsProvider>
+                <TransactionAnalyticsProvider>
+                  <AssetDailyChart />
+                </TransactionAnalyticsProvider>
               </div>
 
               <TransactionAnalyticsProvider>

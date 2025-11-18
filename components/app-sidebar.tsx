@@ -67,6 +67,11 @@ const data = {
       url: "/ledger",
       icon: IconReport,
     },
+    {
+      title: "System Config",
+      url: "/system-config",
+      icon: IconSettings,
+    },
   ],
 };
 

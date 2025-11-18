@@ -1,5 +1,5 @@
+"use client";
 import { useTheme } from "next-themes";
-import React from "react";
 
 function LoadingScreen() {
   const { theme } = useTheme();
@@ -9,15 +9,11 @@ function LoadingScreen() {
       style={{ minHeight: "100vh" }}
     >
       <div style={{ width: "350px" }} className="animate-pulse">
-        <img
-          src={
-            theme === "dark"
-              ? "/images/logo-side-light.png"
-              : "/images/logo-side-dark.png"
-          }
-          className=""
-          alt=""
-        />
+        {theme === "dark" ? (
+          <img src={"/images/logo-side-light.png"} className="" alt="" />
+        ) : (
+          <img src={"/images/logo-side-dark.png"} className="" alt="" />
+        )}
       </div>
     </div>
   );

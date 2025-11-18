@@ -5,6 +5,7 @@ import {
   IconDotsVertical,
   IconLogout,
   IconNotification,
+  IconPassword,
   IconUserCircle,
 } from "@tabler/icons-react";
 
@@ -87,8 +88,8 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <IconUserCircle />
-                Account
+                <IconPassword />
+                Change Password
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
